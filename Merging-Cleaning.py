@@ -13,17 +13,25 @@ df.drop(['Q54TIME', 'Q72TIME'], axis=1, inplace=True)
 
 df.insert(loc=41, column='Q54TIME', value=df3.iloc[:, 1:8].sum(axis=1))
 df.insert(loc=49, column='Q72TIME', value=df3.iloc[:, 8:15].sum(axis=1))
-
 df.drop(df.columns[73:87], axis=1, inplace=True)
+
 # Replace 'Yes', 'No' and 'Do not know' by 1,2 and 3 respectively
 df.replace({'Yes': 1, 'No': 2, 'Do not know':3}, inplace=True)
+
 
 # Removing respondents outside the age range (Q13)
 df = df[(df['Q13Age'] >= 7) & (df['Q13Age'] <= 17)]
 
 
+# Removing missing values from (Q25)
+df = df.dropna(subset=['Q25Miss_Day'])
+
 # There appears to be trailing/leading whitespaces preventing some categories to be replaced in (Q26)
 df['Q26Miss_Rsn'] = df['Q26Miss_Rsn'].str.strip()
+
+# Replacing nan values by -1 in (Q26) to signify that they did not answer (Q25)
+df['Q26Miss_Rsn'] = df['Q26Miss_Rsn'].fillna(-1)
+
 
 # Replacing str by int (Q26)
 df['Q26Miss_Rsn'].replace({
@@ -43,6 +51,21 @@ df['Q26Miss_Rsn'].replace({
     'Did not want to/feel like going to school':14,
     'Other, specify':15,
 }, inplace=True)
+
+# Replacing str by int (Q27)
+df['Q27Daysabsent'].replace({'0 days':1,
+                              '1 to 4 days':2,
+                              '5 to 9 days':3,
+                              '10 to 19 days':4,
+                              '20 or more days':5}, inplace=True)
+
+
+# Removing (Q28) to (Q212) columns since they barely hold any values
+df.drop(df.columns[16:21], axis=1, inplace=True)
+
+# Replacing missing values by 0 for hours spent working (Q51)
+df[['Q51ATIME', 'Q51BTIME', 'Q51CTIME', 'Q51DTIME', 'Q51ETIME', 'Q51FTIME']] = df[['Q51ATIME', 'Q51BTIME', 'Q51CTIME', 'Q51DTIME', 'Q51ETIME', 'Q51FTIME']].fillna(0)
+
 
 # Removing missing values (Q52)
 df = df.dropna(subset=['Q52ABEG_LSTW'])
