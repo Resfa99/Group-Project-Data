@@ -3,8 +3,6 @@ import pandas as pd
 # Importing the data
 df = pd.read_csv('dataset_unlabelled.csv')
 
-# Removing respondents outside the age range (Q13)
-df = df[(df['Q13Age'] >= 7) & (df['Q13Age'] <= 17)]
 
 # Replacing missing values in (Q16) and (Q15) (if mother is part of household, they're alive)
 df.loc[(df['Q16Mothparthh'] == 'Yes') & (df['Q15Mothaliv'].isna()), 'Q15Mothaliv'] = 'Yes'
@@ -27,8 +25,6 @@ df['Q23Eduinst'].replace({'Pre-school (including day care, crèche, pre-primary,
                           'Any other than the above, specify': 9}, inplace=True)
 df['Q23Eduinst'] = df['Q23Eduinst'].fillna(-1)
 
-# Removing values above 12 and below 4 for first grade (Q24)
-df = df[(df['Q24AGE_GR1'].isna()) | ((df['Q24AGE_GR1'] >= 4) & (df['Q24AGE_GR1'] <= 12))]
 
 
 # There appears to be trailing/leading whitespaces in (Q26)
@@ -36,9 +32,6 @@ df['Q26Miss_Rsn'] = df['Q26Miss_Rsn'].str.strip()
 
 # Fill missing values in (Q28) with 'Yes' where (Q22) is 'Yes'
 df.loc[(df['Q22Attend'] == 'Yes') & (df['Q28Everattend'].isna()), 'Q28Everattend'] = 'Yes'
-
-# Delete rows where (Q22) is 'Yes' and (Q28) is 'No'
-df = df.loc[~((df['Q22Attend'] == 'Yes') & (df['Q28Everattend'] == 'No')), :]
 
 
 # Removing (Q29) to (Q212) columns since they don't give particularly useful information
@@ -71,11 +64,6 @@ df.insert(loc=18, column='Q51TIME', value=df.iloc[:, [19, 21, 23, 25, 27, 29]].s
 df.drop(df.columns[19:31], axis=1, inplace=True)
 
 
-# Noticing that some respondents said "Yes" to some questions and then 0 for the time associated (Q51)
-df.loc[df['Q51TIME'] == 0, 'Q51EXTRAWORK_W'] = 'No'
-
-# Removing missing values (Q52)
-df = df.dropna(subset=['Q52ABEG_LSTW'])
 # Replacing missing values by 0 for hours spent working (Q54)
 df['Q54TIME'] = df['Q54TIME'].fillna(0)
 
