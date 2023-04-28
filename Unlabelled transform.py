@@ -181,6 +181,10 @@ df['Q27Daysabsent'].replace({'0 days': 1,
                              '20 or more days': 5,
                              'Unspecified': -1}, inplace=True)
 
+# Adding a 'Child_Labour' column
+df['Child_Labour']= None
+
+
 
 # Exporting merged.csv
 df.to_csv('unlabelled.csv', index=False)
